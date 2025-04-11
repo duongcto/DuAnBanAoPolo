@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Hóa đơn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .btn-back {
+            margin-top: 20px;
+        }
+        .container {
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>Chi tiết Hóa đơn: <span th:text="'HD-' + ${hoaDon.id}"></span></h2>
+        </div>
+        <div class="card-body">
+            <h4>Thông tin khách hàng và nhân viên:</h4>
+            <p><strong>Khách hàng: </strong><span th:text="${hoaDon.khachHang.ten}"></span></p>
+            <p><strong>Số điện thoại: </strong><span th:text="${hoaDon.khachHang.sdt}"></span></p>
+            <p><strong>Nhân viên: </strong><span th:text="${hoaDon.nhanVien.ten}"></span></p>
+            <p><strong>Ngày mua hàng: </strong><span th:text="${hoaDon.ngayMuaHang}"></span></p>
+            <p><strong>Trạng thái: </strong><span th:text="${hoaDon.trangThai ? 'Đã thanh toán' : 'Đã hủy'}"></span></p>
+
+            <h4 class="mt-4">Danh sách sản phẩm trong hóa đơn:</h4>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="chiTiet : ${hoaDonChiTietList}">
+                    <td th:text="${chiTiet.spChiTiet.id}"></td>
+                    <td th:text="${chiTiet.spChiTiet.ten}"></td>
+                    <td th:text="${chiTiet.soLuong}"></td>
+                    <td th:text="${chiTiet.donGia}"></td>
+                    <td th:text="${chiTiet.soLuong * chiTiet.donGia}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <a href="/hoa-don/view" class="btn btn-primary btn-back">Quay lại danh sách hóa đơn</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

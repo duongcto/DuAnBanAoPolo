@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách khuyến mãi sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            display: block;
+            color: #ccc;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .content-section {
+            margin-left: 260px;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+        }
+
+        .card-title {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <a href="/trang-chu">
+            <img src="/img/logo.png" alt="Logo" style="max-width: 120px; height: auto;">
+        </a>
+    </div>
+    <a href="/trang-chu">🏠 Trang chủ</a>
+    <a href="/ban-hang">🛒 Bán hàng</a>
+    <a href="/nhan-vien">👤 Nhân viên</a>
+    <a href="/khach-hang">🧑‍💼 Khách hàng</a>
+    <a href="/san-pham">👕 Sản phẩm</a>
+    <a href="/san-pham-chi-tiet">👕 Sản phẩm chi tiết</a>
+    <a href="/khuyen-mai-san-pham">🎁 Danh sách sản phẩm khuyến mại </a>
+    <a href="/khuyen-mai" class="active">🎁 Khuyến mại</a>
+    <a href="/hoa-don/view">🧾 Hóa đơn</a>
+    <a href="/thong-ke">📊 Thống kê</a>
+</div>
+
+<!-- Content Section -->
+<div class="content-section">
+    <div class="container mt-4">
+        <h1 class="mb-4">Danh sách khuyến mãi sản phẩm</h1>
+
+        <!-- Thông báo thành công -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Thông báo lỗi -->
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+            <a th:href="@{/khuyen-mai-san-pham/them-moi}" class="btn btn-primary">Thêm mới khuyến mãi sản phẩm</a>
+        </div>
+
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Sản phẩm</th>
+                <th>Khuyến mãi</th>
+                <th>Phần trăm giảm</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="spkm : ${sanPhamKhuyenMais}">
+                <td th:text="${spkm.id}"></td>
+                <td th:text="${spkm.sanPham != null ? spkm.sanPham.ten : ''}"></td>
+                <td th:text="${spkm.khuyenMai != null ? spkm.khuyenMai.ten : ''}"></td>
+                <td th:text="${spkm.khuyenMai != null ? spkm.khuyenMai.phanTramGiam + '%' : ''}"></td>
+                <td th:text="${spkm.khuyenMai != null && spkm.khuyenMai.ngayBatDau != null ? #temporals.format(spkm.khuyenMai.ngayBatDau, 'dd/MM/yyyy') : ''}"></td>
+                <td th:text="${spkm.khuyenMai != null && spkm.khuyenMai.ngayKetThuc != null ? #temporals.format(spkm.khuyenMai.ngayKetThuc, 'dd/MM/yyyy') : ''}"></td>
+                <td>
+                    <span th:if="${spkm.trangThai}" class="badge bg-success">Hoạt động</span>
+                    <span th:unless="${spkm.trangThai}" class="badge bg-danger">Ngưng hoạt động</span>
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a th:href="@{/khuyen-mai-san-pham/chi-tiet/{id}(id=${spkm.id})}" class="btn btn-info btn-sm">Chi tiết</a>
+                        <a th:href="@{/khuyen-mai-san-pham/sua/{id}(id=${spkm.id})}" class="btn btn-warning btn-sm">Sửa</a>
+                        <a th:href="@{/khuyen-mai-san-pham/xoa/{id}(id=${spkm.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa khuyến mãi sản phẩm này?');">Xóa</a>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${sanPhamKhuyenMais==null}">
+                <td colspan="8" class="text-center">Không có khuyến mãi sản phẩm nào</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
