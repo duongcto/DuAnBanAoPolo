@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bán hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #ccc;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="text-center pb-3">
+        <a href="/trang-chu">
+            <img src="/img/logo.png" alt="Logo" style="max-width: 120px;">
+        </a>
+    </div>
+    <a href="/trang-chu">🏠 Trang chủ</a>
+    <a href="/ban-hang" class="active">🛒 Bán hàng</a>
+    <a href="/nhan-vien">👤 Nhân viên</a>
+    <a href="/khach-hang">🧑‍💼 Khách hàng</a>
+    <a href="/san-pham">👕 Sản phẩm</a>
+    <a href="/san-pham-chi-tiet">👕 Sản phẩm chi tiết</a>
+    <a href="/khuyen-mai-san-pham">🎁 Sản phẩm khuyến mại</a>
+    <a href="/khuyen-mai">🎁 Khuyến mại</a>
+    <a href="/hoa-don/view">🧾 Hóa đơn</a>
+    <a href="/thong-ke">📊 Thống kê</a>
+</div>
+
+<!-- Main content -->
+<div class="main-content">
+    <div class="row">
+
+        <!-- Cột trái: Xử lý hóa đơn và sản phẩm -->
+        <div class="col-md-5">
+            <h3>🛒 Bán hàng</h3>
+            <!-- Tạo hóa đơn -->
+            <form th:action="@{/ban-hang/tao-hoa-don}" method="post" class="mb-3">
+                <button type="submit" class="btn btn-primary">+ Tạo Hóa Đơn</button>
+            </form>
+            <div id="errorAlert" th:if="${error}" class="alert alert-danger" role="alert">
+                <p th:text="${error}"></p>
+            </div>
+            <!-- Danh sách hóa đơn đã tạo -->
+            <div>
+                <h5>Hóa đơn đã tạo:</h5>
+                <div>
+                    <form th:action="@{/ban-hang}" method="get"
+                          th:each="hoaDon, iterStat : ${hoaDonList}" style="display: inline;">
+                        <input type="hidden" name="idHoaDon" th:value="${hoaDon.id}" />
+                        <button type="submit"
+                                th:classappend="${hoaDon.id == idHoaDonDangChon} ? 'btn-success' : 'btn-outline-primary'"
+                                class="btn"
+                                style="margin-right: 10px;">
+                            HĐ <span th:text="${iterStat.index + 1}"></span>
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+            <h5>Sản phẩm trong hóa đơn</h5>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>SL</th>
+                    <th>Giá</th>
+                    <th>Tổng</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ct : ${hoaDonChiTiet}">
+                    <td th:text="${ct.spChiTiet.ten}"></td>
+                    <td th:text="${ct.soLuong}"></td>
+                    <td th:text="${ct.donGia} + ' đ'"></td>
+                    <td th:text="${ct.soLuong * ct.donGia} + ' đ'"></td>
+                    <td>
+                        <!-- Nút sửa -->
+                        <button class="btn btn-warning btn-sm"
+                                th:attr="data-id=${ct.id}, data-sl=${ct.soLuong}, data-ten=${ct.spChiTiet.ten}"
+                                onclick="hienThiFormSua(this)">Sửa
+                        </button>
+
+                        <!-- Nút xóa -->
+                        <form th:action="@{/ban-hang/xoa}" method="post" style="display: inline;">
+                            <input type="hidden" name="idChiTiet" th:value="${ct.id}" />
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            <!-- Danh sách sản phẩm -->
+            <h5>Danh sách sản phẩm</h5>
+            <form method="get" th:action="@{/ban-hang}" class="mb-3 row">
+                <div class="col-md-4">
+                    <input class="form-control" type="text" name="keyword" placeholder="Id hoặc tên SP..." />
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" name="mauSac">
+                        <option value="">-- Màu --</option>
+                        <option th:each="mau : ${dsMauSac}" th:value="${mau.id}" th:text="${mau.ten}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" name="kichThuoc">
+                        <option value="">-- Size --</option>
+                        <option th:each="size : ${dsKichThuoc}" th:value="${size.id}" th:text="${size.ten}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Lọc</button>
+                </div>
+            </form>
+
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Tên</th>
+                    <th>Màu</th>
+                    <th>Size</th>
+                    <th>Giá</th>
+                    <th>Tồn kho</th>
+                    <th>Thêm</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sp : ${danhSachSanPham}">
+                    <td th:text="${sp.id}"></td>
+                    <td th:text="${sp.ten}"></td>
+                    <td th:text="${sp.mauSac.ten}"></td>
+                    <td th:text="${sp.kichThuoc.ten}"></td>
+                    <td th:text="${sp.donGia}"></td>
+                    <td th:text="${sp.soLuong}"></td>
+                    <td>
+                        <form th:action="@{/ban-hang/them}" method="post">
+                            <input type="hidden" name="idSanPham" th:value="${sp.id}" />
+                            <input type="hidden" name="idHoaDon" th:value="${idHoaDonDangChon}" />
+                            <button class="btn btn-sm btn-primary">+</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Cột phải: Thông tin khách hàng và hóa đơn -->
+        <div class="col-md-7">
+            <!-- khách hàng -->
+            <h5>Loại khách hàng</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="loaiKhach" id="khachLa" value="la"
+                       onclick="chonKhachLa()" th:checked="${loaiKhach == null or loaiKhach == 'la'}">
+                <label class="form-check-label" for="khachLa">Khách lạ</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="loaiKhach" id="khachQuen" value="quen"
+                       onclick="chonKhachQuen()" th:checked="${loaiKhach == 'quen'}">
+                <label class="form-check-label" for="khachQuen">Khách quen</label>
+            </div>
+
+            <!-- Form tìm kiếm khách quen -->
+            <div id="formTimKiemKhach" style="display: none;" class="mt-2">
+                <form method="get" th:action="@{/khach-hang/tim-kiem}">
+                    <input type="hidden" name="idHoaDon" th:value="${idHoaDonDangChon}" />
+                    <input type="hidden" name="loaiKhach" value="quen" /> <!-- Thêm dòng này -->
+                    <input class="form-control mb-2" type="text" name="keyword" placeholder="Số điện thoại..." required />
+                    <button class="btn btn-primary mb-3" type="submit">Tìm</button>
+                </form>
+            </div>
+            <input type="hidden" name="idHoaDon" th:value="${hoaDon.id}" />
+            <div th:if="${loiKhach}" class="alert alert-danger" th:text="${loiKhach}"></div>
+
+
+
+            <!-- Thông tin hóa đơn -->
+            <div class="card mb-3">
+                <div class="card-header">Thông tin hóa đơn</div>
+                <div class="card-body">
+                    <p><strong>Nhân viên:</strong> <span th:text="${nhanVien.ten}"></span></p>
+                    <p><strong>Ngày tạo:</strong> <span th:text="${hoaDon.ngayMuaHang}"></span></p>
+                    <p><strong>Khách hàng:</strong>
+                        <span th:text="${hoaDon.khachHang != null ? hoaDon.khachHang.ten : 'Khách lạ'}"></span>
+                    </p>
+                    <p><strong>Tổng tiền:</strong>
+                        <span id="tongTienText" th:text="${#numbers.formatDecimal(tongTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                        <span id="tongTienRaw" th:text="${tongTien}" style="display:none;"></span>
+                    </p>
+
+                    <label>Mã giảm giá:</label>
+                    <select class="form-select" id="selectMaGiamGia">
+                        <option value="">-- Chọn mã --</option>
+                        <option th:each="km : ${danhSachKhuyenMai}"
+                                th:value="${km.id}"
+                                th:text="${km.ten + ' - ' + km.phanTramGiam + '%'}"
+                                th:attr="data-giam=${km.phanTramGiam}">
+                        </option>
+                    </select>
+
+                    <p><strong>Tiền phải thanh toán:</strong>
+                        <span id="tienSauGiam">0 đ</span>
+                    </p>
+                    <!-- Thêm ghi chú -->
+                    <p><strong>Ghi chú:</strong>
+                        <textarea id="ghiChu" rows="3" class="form-control" placeholder="Nhập ghi chú nếu có..."></textarea>
+                    </p>
+                </div>
+            </div>
+
+            <input type="hidden" id="idHoaDonDangChon" th:value="${idHoaDonDangChon}" />
+
+            <!-- Thanh toán -->
+            <div class="card">
+                <div class="card-header">Thanh toán</div>
+                <div class="card-body">
+                    <form th:action="@{/ban-hang/thanh-toan}" method="post" onsubmit="prepareFormThanhToan()">
+                        <input type="hidden" name="idHoaDon" th:value="${hoaDon.id}" />
+                        <input type="hidden" name="tongTien" th:value="${tongTien}" id="tongTienInput" />
+                        <input type="hidden" name="tienSauGiam" id="tienSauGiamInput" />
+                        <input type="hidden" name="maGiamGia" id="maGiamGiaInput" />
+
+                        <!-- Hình thức thanh toán -->
+                        <div class="form-group">
+                            <label for="hinhThucThanhToan">Hình thức thanh toán</label>
+                            <select name="hinhThucThanhToan" id="hinhThucThanhToan" class="form-select" required>
+                                <option value="TienMat">Tiền mặt</option>
+                                <option value="ChuyenKhoan">Chuyển khoản</option>
+                                <option value="The">Thẻ</option>
+                            </select>
+                        </div>
+
+                        <!-- Thanh toán -->
+                        <button class="btn btn-success w-100" type="submit">Thanh Toán</button>
+
+                    </form>
+
+                    <!-- Nút hủy hóa đơn -->
+                    <form th:action="@{/ban-hang/huy-hoa-don}" method="post" class="mt-2">
+                        <input type="hidden" name="idHoaDon" th:value="${hoaDon.id}" />
+                        <button type="submit" class="btn btn-danger w-100">Hủy hóa đơn</button>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+<div id="suaModal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%);
+     background:#fff; padding:20px; border:1px solid #ccc; z-index:9999;">
+    <h5>Sửa số lượng sản phẩm: <span id="tenSanPhamSua"></span></h5>
+    <form id="formSua" method="post" th:action="@{/ban-hang/sua-so-luong}">
+        <input type="hidden" name="idChiTiet" id="idChiTietSua"/>
+        <input type="number" name="soLuongMoi" id="soLuongMoi" min="0" class="form-control mb-2" required/>
+        <div id="thongBaoSua" style="color:red;"></div>
+        <button type="submit" class="btn btn-success">Xác nhận</button>
+        <button type="button" onclick="anFormSua()" class="btn btn-secondary">Hủy</button>
+    </form>
+</div>
+<div th:if="${error}" class="alert alert-danger" id="thongBaoLoi">
+    <span th:text="${error}"></span>
+</div>
+<script>
+    // Lấy tổng tiền từ dữ liệu ẩn
+    let tongTien = parseFloat(document.getElementById("tongTienRaw").textContent);
+
+    // Hàm tính số tiền sau khi áp dụng mã giảm giá
+    function tinhTienPhaiThanhToan() {
+        let maGiamGiaElement = document.getElementById("selectMaGiamGia");
+        let maGiamGia = maGiamGiaElement.options[maGiamGiaElement.selectedIndex];
+
+        // Nếu chọn mã giảm giá
+        if (maGiamGia.value) {
+            let giamGia = parseFloat(maGiamGia.getAttribute('data-giam'));
+            let tienSauGiam = tongTien * (1 - giamGia / 100);
+            document.getElementById("tienSauGiam").textContent = formatCurrency(tienSauGiam) + ' đ';
+        } else {
+            // Nếu không chọn mã giảm giá
+            document.getElementById("tienSauGiam").textContent = formatCurrency(tongTien) + ' đ';
+        }
+    }
+
+    // Hàm format tiền
+    function formatCurrency(amount) {
+        return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Lắng nghe sự kiện khi người dùng chọn mã giảm giá
+    document.getElementById("selectMaGiamGia").addEventListener("change", tinhTienPhaiThanhToan);
+
+    // Gọi hàm tính ngay khi trang được tải
+    tinhTienPhaiThanhToan();
+</script>
+
+
+<script>
+    function chonKhachLa() {
+        const idHoaDon = document.getElementById("idHoaDonDangChon").value;
+
+        fetch("/ban-hang/chon-khach-la?idHoaDon=" + idHoaDon, {
+            method: "POST"
+        }).then(() => window.location.reload());
+    }
+
+
+    function chonKhachQuen() {
+        document.getElementById("formTimKiemKhach").style.display = "block";
+    }
+</script>
+
+<script>
+    setTimeout(() => {
+        let tb = document.getElementById("thongBaoLoi");
+        if (tb) tb.style.display = "none";
+    }, 3000);
+</script>
+
+<script>
+    function hienThiFormSua(button) {
+        const id = button.getAttribute('data-id');
+        const ten = button.getAttribute('data-ten');
+        const sl = button.getAttribute('data-sl');
+
+        document.getElementById("idChiTietSua").value = id;
+        document.getElementById("soLuongMoi").value = sl;
+        document.getElementById("tenSanPhamSua").innerText = ten;
+        document.getElementById("thongBaoSua").innerText = "";
+        document.getElementById("suaModal").style.display = "block";
+    }
+
+    function anFormSua() {
+        document.getElementById("suaModal").style.display = "none";
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    setTimeout(function () {
+        var alert = document.getElementById('errorAlert');
+        if (alert) {
+            alert.style.display = 'none';
+        }
+    }, 3000); // 3000 ms = 3 giây
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var loaiKhach = /*[[${loaiKhach}]]*/ 'la';
+    if (loaiKhach === 'quen') {
+        document.getElementById('formTimKiemKhach').style.display = 'block';
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Đăng nhập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #dde6f5, #e4ecf7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 40px 30px;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            width: 360px;
+            max-width: 90%;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 42px 14px 14px;
+            border: 1px solid #dcdfe6;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+
+        .input-group .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: #999;
+            transition: fill 0.3s;
+        }
+
+        .input-group .toggle-password:hover {
+            fill: #3b82f6;
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .links a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #2563eb;
+        }
+
+        .social-login {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        .social-login p {
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .social-buttons button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .social-buttons button:hover {
+            transform: translateY(-2px);
+        }
+
+        .google { background-color: #DB4437; }
+        .facebook { background-color: #4267B2; }
+        .twitter { background-color: #1DA1F2; }
+
+        .social-buttons svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <form action="login" method="post" class="login-form">
+
+        <div th:if="${message1}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${message1}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <h2>Đăng nhập</h2>
+
+
+
+        <div class="input-group">
+            <input type="text" name="username" placeholder="Email hoặc tên đăng nhập" required>
+        </div>
+
+        <div class="input-group">
+            <input type="password" name="password" id="password" placeholder="Mật khẩu" required>
+            <svg id="eyeIcon" class="toggle-password" onclick="togglePassword()" xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 8.11 1 12c1.73 3.89 6 7.5 11 7.5s9.27-3.61 11-7.5C21.27 8.11 17 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+            </svg>
+        </div>
+
+        <div class="links">
+            <a href="">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="login-btn">Đăng nhập</button>
+
+        <div class="social-login">
+            <p>Hoặc đăng nhập bằng</p>
+            <div class="social-buttons">
+                <button class="google">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M21.35 11.1H12v2.8h5.4c-.3 1.6-1.7 3-5.4 3-3.2 0-5.9-2.6-5.9-5.9s2.7-5.9 5.9-5.9c1.8 0 3.1.7 3.8 1.3l2.6-2.5C17.6 2.6 15 2 12.1 2 6.7 2 2.3 6.4 2.3 11.8s4.4 9.8 9.8 9.8c5.6 0 9.3-3.9 9.3-9.4 0-.6-.1-1.1-.2-1.6z"/></svg>
+                    Google
+                </button>
+                <button class="facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M22.68 0H1.32A1.32 1.32 0 000 1.32v21.36A1.32 1.32 0 001.32 24h11.48v-9.33H9.69v-3.63h3.11V8.41c0-3.07 1.87-4.75 4.61-4.75 1.31 0 2.44.1 2.77.14v3.21l-1.9.001c-1.49 0-1.78.71-1.78 1.75v2.29h3.56l-.46 3.63h-3.1V24h6.08A1.32 1.32 0 0024 22.68V1.32A1.32 1.32 0 0022.68 0z"/></svg>
+                    Facebook
+                </button>
+                <button class="twitter">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M24 4.56c-.89.4-1.84.67-2.84.79a4.92 4.92 0 002.16-2.71 9.88 9.88 0 01-3.13 1.2 4.92 4.92 0 00-8.38 4.48A13.95 13.95 0 011.64 3.16a4.92 4.92 0 001.52 6.57A4.88 4.88 0 01.96 9.1v.06a4.92 4.92 0 003.95 4.83 4.9 4.9 0 01-2.21.08 4.92 4.92 0 004.59 3.41A9.87 9.87 0 010 21.54a13.94 13.94 0 007.55 2.21c9.05 0 14-7.5 14-14v-.64A9.88 9.88 0 0024 4.56z"/></svg>
+                    X
+                </button>
+            </div>
+        </div></form>
+</div>
+
+<!-- 👇 Thay phần input mật khẩu và JS như sau -->
+
+
+
+<script>
+    function togglePassword() {
+        const pwInput = document.getElementById("password");
+        const eyeIcon = document.getElementById("eyeIcon");
+        const isPassword = pwInput.type === "password";
+
+        pwInput.type = isPassword ? "text" : "password";
+
+        // Thay SVG icon khi đổi trạng thái
+        eyeIcon.innerHTML = isPassword
+            ? `<path d="M12 4.5C7 4.5 2.73 8.11 1 12c1.73 3.89 6 7.5 11 7.5s9.27-3.61 11-7.5C21.27 8.11 17 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>`;
+    }73 8.11 1 12c1.73 3.89 6 7.5 11 7.5s9.27-3.61 11-7.5C21.27 8.11 17 4.5 12 4.5zm0 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/>`
+    : `<path d="M12 4.5C7 4.5 2.
+</script>
+
+</body>
+</html>

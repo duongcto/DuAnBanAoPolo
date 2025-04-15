@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý khách hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #ccc;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .sidebar-logo img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo text-center mb-3">
+        <a href="/trang-chu">
+            <img src="/img/logo.png" alt="Logo">
+        </a>
+    </div>
+    <a href="/trang-chu">🏠 Trang chủ</a>
+    <a href="/ban-hang">🛒 Bán hàng</a>
+    <a href="/nhan-vien">👤 Nhân viên</a>
+    <a href="/khach-hang" class="active">🧑‍💼 Khách hàng</a>
+    <a href="/san-pham">👕 Sản phẩm</a>
+    <a href="/san-pham-chi-tiet">👕 Sản phẩm chi tiết</a>
+    <a href="/khuyen-mai-san-pham">🎁 Danh sách sản phẩm khuyến mại</a>
+    <a href="/khuyen-mai">🎁 Khuyến mại</a>
+    <a href="/hoa-don/view">🧾 Hóa đơn</a>
+    <a href="/thong-ke">📊 Thống kê</a>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="content flex-grow-1">
+        <div class="container d-flex align-items-center justify-content-between py-3">
+            <h2 class="text-primary fw-bold"><i class="bi bi-people"></i> Danh sách khách hàng</h2>
+            <a class="btn btn-success btn-lg d-flex align-items-center" th:href="@{|/KhachHang/AddKhachHang|}">
+                <i class="bi bi-plus-circle me-2"></i> Thêm khách hàng
+            </a>
+        </div>
+
+    <div class="container-fluid">
+        <div class="card shadow-sm rounded">
+            <div class="card-body">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Mã KH</th>
+                        <th scope="col">Tên KH</th>
+                        <th scope="col">SĐT</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="kh : ${listKhachHang}">
+                        <td th:text="${kh.maKH}"></td>
+                        <td th:text="${kh.ten}"></td>
+                        <td th:text="${kh.sdt}"></td>
+                        <td th:text="${kh.email}"></td>
+                        <td th:text="${kh.trangThai} ? 'Hoạt động' : 'Không hoạt động'"></td>
+                        <td>
+                            <a class="btn btn-info btn-sm text-white" th:href="@{|/detail/${kh.id}|}">
+                                <i class="bi bi-eye"></i> Xem thông tin
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
